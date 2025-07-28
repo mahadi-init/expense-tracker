@@ -31,14 +31,14 @@ export default function Dashboard() {
 
         <p className="mt-2 text-gray-500 text-lg">Current Month</p>
 
-        <div className="mt-6 flex gap-6 items-center">
-          <div className="flex flex-col gap-2 items-center">
-            <div className="h-52 w-14 bg-[#F2F5F2] border-t-2"></div>
+        <div className="mt-6 flex gap-6 w-full">
+          <div className="flex flex-col gap-2 items-center flex-1/2">
+            <div className="h-52 w-full bg-[#F2F5F2] border-t-2"></div>
             <p className="text-md font-medium text-gray-500">Income</p>
           </div>
 
-          <div className="flex flex-col gap-2 items-center">
-            <div className="h-52 w-14 bg-[#F2F5F2] border-t-4"></div>
+          <div className="flex flex-col gap-2 items-center flex-1">
+            <div className="h-52 w-full bg-[#F2F5F2] border-t-2"></div>
             <p className="text-md font-medium text-gray-500">Expenses</p>
           </div>
         </div>
