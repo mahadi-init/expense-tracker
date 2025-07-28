@@ -8,12 +8,17 @@ export default function Header() {
 
   return (
     <div className="flex items-center justify-between p-6">
+      {currentRoute?.back}
       <div className="flex-1 flex justify-center">
         <p className="font-semibold">{currentRoute?.title}</p>
       </div>
-      <Link to={"/settings"}>
-        <Settings />
-      </Link>
+
+      {/* when route is hide don't show settings */}
+      {!currentRoute?.hide && (
+        <Link to={"/settings"}>
+          <Settings />
+        </Link>
+      )}
     </div>
   );
 }

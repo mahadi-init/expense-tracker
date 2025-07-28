@@ -8,6 +8,7 @@ import Reports from "./pages/reports";
 import Settings from "./pages/settings";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import Categories from "./components/Categories";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/categories" element={<Categories />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
