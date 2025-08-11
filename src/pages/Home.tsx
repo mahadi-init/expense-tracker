@@ -1,12 +1,7 @@
-import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
+import { IonContent, IonPage } from "@ionic/react";
 import "./../styles/home.css";
 import Wrapper from "../components/Wrapper";
+import Toolbar from "../components/Toolbar";
 
 const Home: React.FC = () => {
   const data = {
@@ -18,11 +13,7 @@ const Home: React.FC = () => {
   return (
     <IonPage>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="small">Hello</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <Toolbar title="Home" />
         <Wrapper>
           <div className="stats-container">
             <div className="stat-card">

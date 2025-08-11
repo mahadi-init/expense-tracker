@@ -2,14 +2,15 @@ import { IonContent, IonIcon, IonPage } from "@ionic/react";
 import "./../styles/settings.css";
 import { arrowForwardOutline, cloudUploadOutline } from "ionicons/icons";
 import Wrapper from "../components/Wrapper";
+import Toolbar from "../components/Toolbar";
 
 const Settings: React.FC = () => {
   return (
     <IonPage>
       <IonContent fullscreen>
+        <Toolbar title="Settings" />
         <Wrapper>
           <div className="settings-container">
-            {/* General */}
             <div className="settings-section">
               <p className="settings-heading">General</p>
               <div className="settings-list">
@@ -28,7 +29,6 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
-            {/* Notifications */}
             <div className="settings-section">
               <p className="settings-heading">Notifications</p>
               <div className="settings-list">
@@ -43,7 +43,6 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
-            {/* Data */}
             <div className="settings-section">
               <p className="settings-heading">Data</p>
               <div className="settings-list">
@@ -58,7 +57,6 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
-            {/* About */}
             <div className="settings-section">
               <p className="settings-heading">About</p>
               <div className="settings-list">

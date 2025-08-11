@@ -1,22 +1,13 @@
-import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
+import { IonContent, IonPage } from "@ionic/react";
 import "./../styles/income.css";
 import Wrapper from "../components/Wrapper";
+import Toolbar from "../components/Toolbar";
 
 const Income: React.FC = () => {
   return (
     <IonPage>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Tab 2</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <Toolbar title="Income" />
         <Wrapper>
           <div className="form-container">
             <input placeholder="Amount" className="form-input" />

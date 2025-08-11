@@ -1,11 +1,13 @@
 import { IonContent, IonPage } from "@ionic/react";
 import "./../styles/expenses.css";
 import Wrapper from "../components/Wrapper";
+import Toolbar from "../components/Toolbar";
 
 const Expenses: React.FC = () => {
   return (
     <IonPage>
       <IonContent fullscreen>
+        <Toolbar title="Expenses" />
         <Wrapper>
           <div className="form-container">
             <input placeholder="Amount" className="form-input" />
