@@ -6,8 +6,8 @@ import Toolbar from "../components/Toolbar";
 const Expenses: React.FC = () => {
   return (
     <IonPage>
+      <Toolbar title="Expenses" />
       <IonContent fullscreen>
-        <Toolbar title="Expenses" />
         <Wrapper>
           <div className="form-container">
             <input placeholder="Amount" className="form-input" />

@@ -1,21 +1,5 @@
-import { Redirect, Route } from "react-router-dom";
-import {
-  IonApp,
-  IonIcon,
-  IonLabel,
-  IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-  setupIonicReact,
-  IonSpinner,
-} from "@ionic/react";
+import { IonApp, setupIonicReact, useIonRouter } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { cardOutline, home, settings, walletOutline } from "ionicons/icons";
-import Home from "./pages/Home";
-import Income from "./pages/Income";
-import Expenses from "./pages/Expenses";
-import Settings from "./pages/Settings";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -35,45 +19,18 @@ import { SplashScreen } from "@capacitor/splash-screen";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { Capacitor } from "@capacitor/core";
 import { useEffect, useState } from "react";
+import TabView from "./TabView";
+import Login from "./pages/Login";
+import AppLoader from "./components/AppLoader";
+import { Route, Switch } from "react-router";
+import { useSetAtom } from "jotai";
+import { userAtom } from "./lib/atoms";
 
 setupIonicReact();
 
-// Loading component that matches splash screen design
-const AppLoader: React.FC = () => (
-  <IonApp>
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        backgroundColor: "var(--ion-background-color, #ffffff)",
-        transition: "opacity 0.3s ease-in-out",
-      }}
-    >
-      <div style={{ marginBottom: "2rem" }}>
-        {/* Your app logo/icon here */}
-        <IonIcon
-          icon={home}
-          style={{
-            fontSize: "4rem",
-            color: "var(--ion-color-primary)",
-          }}
-        />
-      </div>
-      <IonSpinner
-        name="crescent"
-        color="primary"
-        style={{ transform: "scale(1.2)" }}
-      />
-    </div>
-  </IonApp>
-);
-
 const App: React.FC = () => {
-  const [appReady, setAppReady] = useState(false);
   const [initializing, setInitializing] = useState(true);
+  const setUser = useSetAtom(userAtom);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -89,18 +46,15 @@ const App: React.FC = () => {
           );
         }
 
-        // Add your async initialization tasks here
-        // Examples:
-        // - Database initialization
-        // - User authentication check
-        // - App configuration loading
-        // - Cache warming
-
         // Simulate critical app initialization
         initPromises.push(
           new Promise((resolve) => {
-            // Replace with actual initialization logic
-            setTimeout(resolve, 100); // Minimal delay for critical tasks only
+            // setUser({
+            //   id: "123",
+            //   name: "mahadi",
+            //   email: "email",
+            // });
+            setTimeout(resolve, 100);
           }),
         );
 
@@ -108,17 +62,14 @@ const App: React.FC = () => {
         await Promise.all(initPromises);
 
         // Small delay to ensure smooth transition
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        // Set app as ready
-        setAppReady(true);
+        await new Promise((resolve) => setTimeout(resolve, 50));
 
         // Hide splash screen after a short delay to prevent flicker
         if (Capacitor.isNativePlatform()) {
           setTimeout(async () => {
             await SplashScreen.hide();
             setInitializing(false);
-          }, 150);
+          }, 100);
         } else {
           // For web, just remove the loading state
           setTimeout(() => {
@@ -127,8 +78,6 @@ const App: React.FC = () => {
         }
       } catch (error) {
         console.error("App initialization failed:", error);
-        // Handle initialization errors gracefully
-        setAppReady(true);
         setInitializing(false);
 
         if (Capacitor.isNativePlatform()) {
@@ -138,59 +87,24 @@ const App: React.FC = () => {
     };
 
     initializeApp();
-  }, []);
+  }, [setUser]);
 
-  // Show loader during initialization
   if (initializing) {
     return <AppLoader />;
   }
 
-  // Main app content
   return (
-    <IonApp
-      style={{
-        opacity: appReady ? 1 : 0,
-        transition: "opacity 0.3s ease-in-out",
-      }}
-    >
+    <IonApp>
       <IonReactRouter>
-        <IonTabs>
-          <IonRouterOutlet>
-            <Route exact path="/home">
-              <Home />
-            </Route>
-            <Route exact path="/income">
-              <Income />
-            </Route>
-            <Route path="/expenses">
-              <Expenses />
-            </Route>
-            <Route path="/settings">
-              <Settings />
-            </Route>
-            <Route exact path="/">
-              <Redirect to="/home" />
-            </Route>
-          </IonRouterOutlet>
-          <IonTabBar slot="bottom">
-            <IonTabButton tab="home" href="/home">
-              <IonIcon aria-hidden="true" icon={home} />
-              <IonLabel>Home</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="income" href="/income">
-              <IonIcon aria-hidden="true" icon={cardOutline} />
-              <IonLabel>Income</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="expenses" href="/expenses">
-              <IonIcon aria-hidden="true" icon={walletOutline} />
-              <IonLabel>Expenses</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="settings" href="/settings">
-              <IonIcon aria-hidden="true" icon={settings} />
-              <IonLabel>Settings</IonLabel>
-            </IonTabButton>
-          </IonTabBar>
-        </IonTabs>
+        <Switch>
+          <Route exact path="/login">
+            <Login />
+          </Route>
+
+          <Route path="/">
+            <TabView />
+          </Route>
+        </Switch>
       </IonReactRouter>
     </IonApp>
   );

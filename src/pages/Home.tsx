@@ -12,8 +12,8 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
+      <Toolbar title="Home" />
       <IonContent fullscreen>
-        <Toolbar title="Home" />
         <Wrapper>
           <div className="stats-container">
             <div className="stat-card">

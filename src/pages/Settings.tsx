@@ -7,8 +7,8 @@ import Toolbar from "../components/Toolbar";
 const Settings: React.FC = () => {
   return (
     <IonPage>
+      <Toolbar title="Settings" />
       <IonContent fullscreen>
-        <Toolbar title="Settings" />
         <Wrapper>
           <div className="settings-container">
             <div className="settings-section">
