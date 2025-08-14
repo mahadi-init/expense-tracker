@@ -1,4 +1,13 @@
-import { IonApp, setupIonicReact, useIonRouter } from "@ionic/react";
+import {
+  IonApp,
+  IonIcon,
+  IonLabel,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+  setupIonicReact,
+} from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 
 /* Core CSS required for Ionic components to work properly */
@@ -19,18 +28,18 @@ import { SplashScreen } from "@capacitor/splash-screen";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { Capacitor } from "@capacitor/core";
 import { useEffect, useState } from "react";
-import TabView from "./TabView";
-import Login from "./pages/Login";
 import AppLoader from "./components/AppLoader";
-import { Route, Switch } from "react-router";
-import { useSetAtom } from "jotai";
-import { userAtom } from "./lib/atoms";
+import { Redirect, Route } from "react-router";
+import Home from "./pages/Home";
+import Income from "./pages/Income";
+import Expenses from "./pages/Expenses";
+import Settings from "./pages/Settings";
+import { cardOutline, home, settings, walletOutline } from "ionicons/icons";
 
 setupIonicReact();
 
 const App: React.FC = () => {
   const [initializing, setInitializing] = useState(true);
-  const setUser = useSetAtom(userAtom);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -49,11 +58,6 @@ const App: React.FC = () => {
         // Simulate critical app initialization
         initPromises.push(
           new Promise((resolve) => {
-            // setUser({
-            //   id: "123",
-            //   name: "mahadi",
-            //   email: "email",
-            // });
             setTimeout(resolve, 100);
           }),
         );
@@ -87,7 +91,7 @@ const App: React.FC = () => {
     };
 
     initializeApp();
-  }, [setUser]);
+  }, []);
 
   if (initializing) {
     return <AppLoader />;
@@ -96,15 +100,43 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
-        <Switch>
-          <Route exact path="/login">
-            <Login />
-          </Route>
-
-          <Route path="/">
-            <TabView />
-          </Route>
-        </Switch>
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route exact path="/home">
+              <Home />
+            </Route>
+            <Route exact path="/income">
+              <Income />
+            </Route>
+            <Route exact path="/expenses">
+              <Expenses />
+            </Route>
+            <Route exact path="/settings">
+              <Settings />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+          </IonRouterOutlet>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="home" href="/home">
+              <IonIcon aria-hidden="true" icon={home} />
+              <IonLabel>Home</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="income" href="/income">
+              <IonIcon aria-hidden="true" icon={cardOutline} />
+              <IonLabel>Income</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="expenses" href="/expenses">
+              <IonIcon aria-hidden="true" icon={walletOutline} />
+              <IonLabel>Expenses</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="settings" href="/settings">
+              <IonIcon aria-hidden="true" icon={settings} />
+              <IonLabel>Settings</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
       </IonReactRouter>
     </IonApp>
   );

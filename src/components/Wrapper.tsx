@@ -5,7 +5,7 @@ export default function Wrapper({
   className,
 }: {
   children: React.ReactNode;
-  className: string;
+  className?: string;
 }) {
   return <div className={`wrapper-container ${className}`}>{children}</div>;
 }
