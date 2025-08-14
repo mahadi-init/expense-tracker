@@ -27,14 +27,15 @@ import "./theme/variables.css";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { Capacitor } from "@capacitor/core";
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import AppLoader from "./components/AppLoader";
 import { Redirect, Route } from "react-router";
-import Home from "./pages/Home";
-import Income from "./pages/Income";
-import Expenses from "./pages/Expenses";
-import Settings from "./pages/Settings";
 import { cardOutline, home, settings, walletOutline } from "ionicons/icons";
+
+const Home = lazy(() => import("./pages/Home"));
+const Expenses = lazy(() => import("./pages/Expenses"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Income = lazy(() => import("./pages/Income"));
 
 setupIonicReact();
 
