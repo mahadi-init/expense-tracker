@@ -32,6 +32,11 @@ const incomeSchema = z.object({
 
 type IncomeFormData = z.infer<typeof incomeSchema>;
 
+const getCurrentDate = () => {
+  const today = new Date();
+  return today.toISOString().split("T")[0];
+};
+
 const Income: React.FC = () => {
   const { mutate } = useSWRConfig();
   const { trigger } = useSWRMutation(
@@ -46,6 +51,9 @@ const Income: React.FC = () => {
     reset,
   } = useForm<IncomeFormData>({
     resolver: zodResolver(incomeSchema),
+    defaultValues: {
+      date: getCurrentDate(),
+    },
   });
 
   const onSubmit = async (data: IncomeFormData) => {

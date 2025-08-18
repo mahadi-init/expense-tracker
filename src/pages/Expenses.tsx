@@ -32,6 +32,11 @@ const expenseSchema = z.object({
 
 type ExpenseFormData = z.infer<typeof expenseSchema>;
 
+const getCurrentDate = () => {
+  const today = new Date();
+  return today.toISOString().split("T")[0];
+};
+
 const Expenses: React.FC = () => {
   const [showCategories, setShowCategories] = useState(false);
   const { mutate } = useSWRConfig();
@@ -62,6 +67,9 @@ const Expenses: React.FC = () => {
     setValue,
   } = useForm<ExpenseFormData>({
     resolver: zodResolver(expenseSchema),
+    defaultValues: {
+      date: getCurrentDate(),
+    },
   });
 
   // Watch form values to determine focus states
