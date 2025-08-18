@@ -31,12 +31,12 @@ import { lazy, useEffect, useState } from "react";
 import AppLoader from "./components/AppLoader";
 import { Redirect, Route } from "react-router";
 import { cardOutline, home, settings, walletOutline } from "ionicons/icons";
-import IncomeList from "./pages/IncomeList";
 
 const Home = lazy(() => import("./pages/Home"));
 const Expenses = lazy(() => import("./pages/Expenses"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Income = lazy(() => import("./pages/Income"));
+const IncomeList = lazy(() => import("./pages/IncomeList"));
 
 setupIonicReact();
 
