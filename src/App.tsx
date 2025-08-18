@@ -31,6 +31,7 @@ import { lazy, useEffect, useState } from "react";
 import AppLoader from "./components/AppLoader";
 import { Redirect, Route } from "react-router";
 import { cardOutline, home, settings, walletOutline } from "ionicons/icons";
+import IncomeList from "./pages/IncomeList";
 
 const Home = lazy(() => import("./pages/Home"));
 const Expenses = lazy(() => import("./pages/Expenses"));
@@ -108,6 +109,9 @@ const App: React.FC = () => {
             </Route>
             <Route exact path="/income">
               <Income />
+            </Route>
+            <Route path="/income/list">
+              <IncomeList />
             </Route>
             <Route exact path="/expenses">
               <Expenses />

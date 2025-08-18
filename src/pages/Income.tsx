@@ -193,6 +193,16 @@ const Income: React.FC = () => {
                     <span>{isSubmitting ? "Saving..." : "Save Income"}</span>
                   </div>
                 </IonButton>
+
+                <IonButton
+                  color={"secondary"}
+                  type="button"
+                  size="default"
+                  className="w-full"
+                  routerLink="/income/list"
+                >
+                  View All
+                </IonButton>
               </form>
             </div>
 
