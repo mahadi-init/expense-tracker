@@ -3,32 +3,130 @@ import Wrapper from "../components/Wrapper";
 import Toolbar from "../components/Toolbar";
 import get from "../https/get";
 import useSWR from "swr";
+import { DashboardStats } from "../types/dashboard";
 
-interface DashboardStats {
-  success: boolean;
-  data: {
-    month: string;
-    day: string;
-    monthlyDashboard: {
-      income: number;
-      expenses: number;
-      net: number;
-    };
-    dailyDashboard: {
-      income: number;
-      expenses: number;
-      net: number;
-    };
-    monthlyCost: number;
-    dailyCost: number;
-    total: {
-      total_income: number;
-      total_expense: number;
-      createdAt: string;
-      updatedAt: string;
-    };
-  };
-}
+// Skeleton component for reusable loading states
+const Skeleton = ({ className }: { className?: string }) => (
+  <div
+    className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`}
+  ></div>
+);
+
+const LoadingSkeleton = () => (
+  <Wrapper>
+    <div className="space-y-8 pb-8">
+      {/* Current Balance Skeleton */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800 p-8 shadow-2xl">
+        <div className="relative z-10">
+          <Skeleton className="h-6 w-32 mb-2" />
+          <Skeleton className="h-10 w-48 mb-4" />
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Skeleton className="w-3 h-3 rounded-full" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Skeleton className="w-3 h-3 rounded-full" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Daily Overview Skeleton */}
+      <div className="space-y-4">
+        <div className="flex items-center">
+          <Skeleton className="w-1 h-8 rounded-full mr-3" />
+          <Skeleton className="h-8 w-36" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Daily Income Skeleton */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <Skeleton className="w-12 h-12 rounded-xl" />
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-20 mb-1" />
+            <Skeleton className="h-8 w-24" />
+          </div>
+
+          {/* Daily Expenses Skeleton */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <Skeleton className="w-12 h-12 rounded-xl" />
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-24 mb-1" />
+            <Skeleton className="h-8 w-28" />
+          </div>
+        </div>
+
+        {/* Daily Net Skeleton */}
+        <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 border border-gray-200 dark:border-gray-600">
+          <div className="flex items-center justify-between">
+            <div>
+              <Skeleton className="h-4 w-16 mb-1" />
+              <Skeleton className="h-9 w-32" />
+            </div>
+            <Skeleton className="w-16 h-16 rounded-xl" />
+          </div>
+        </div>
+      </div>
+
+      {/* Monthly Overview Skeleton */}
+      <div className="space-y-4">
+        <div className="flex items-center">
+          <Skeleton className="w-1 h-8 rounded-full mr-3" />
+          <Skeleton className="h-8 w-40" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Monthly Income Skeleton */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <Skeleton className="w-12 h-12 rounded-xl" />
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-28 mb-1" />
+            <Skeleton className="h-8 w-32" />
+          </div>
+
+          {/* Monthly Expenses Skeleton */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <Skeleton className="w-12 h-12 rounded-xl" />
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-32 mb-1" />
+            <Skeleton className="h-8 w-36" />
+          </div>
+        </div>
+
+        {/* Monthly Net Skeleton */}
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <Skeleton className="h-4 w-20 mb-1" />
+              <Skeleton className="h-9 w-36" />
+            </div>
+            <Skeleton className="w-16 h-16 rounded-xl" />
+          </div>
+        </div>
+      </div>
+
+      {/* Monthly Cost Summary Skeleton */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
+        <div className="text-center">
+          <Skeleton className="w-16 h-16 rounded-2xl mb-4 mx-auto" />
+          <Skeleton className="h-6 w-40 mb-2 mx-auto" />
+          <Skeleton className="h-10 w-48 mb-2 mx-auto" />
+          <Skeleton className="h-4 w-36 mx-auto" />
+        </div>
+      </div>
+    </div>
+  </Wrapper>
+);
 
 const Home: React.FC = () => {
   const { data, isLoading } = useSWR("/dashboard/stats", async () => {
@@ -41,14 +139,7 @@ const Home: React.FC = () => {
       <IonPage>
         <Toolbar title="Home" />
         <IonContent fullscreen>
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-lg font-medium text-gray-600 dark:text-gray-400">
-                Loading your dashboard...
-              </p>
-            </div>
-          </div>
+          <LoadingSkeleton />
         </IonContent>
       </IonPage>
     );

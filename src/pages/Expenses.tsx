@@ -201,9 +201,6 @@ const Expenses: React.FC = () => {
                         : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                     } text-gray-900 dark:text-white focus:outline-none`}
                   />
-                  <label className="absolute left-12 -top-2 text-xs font-medium text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-900 px-2">
-                    Date
-                  </label>
                 </div>
 
                 {/* Note Field */}

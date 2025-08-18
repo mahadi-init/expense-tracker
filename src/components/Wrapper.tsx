@@ -1,5 +1,3 @@
-import "./../styles/wrapper.css";
-
 export default function Wrapper({
   children,
   className,
@@ -7,5 +5,5 @@ export default function Wrapper({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <div className={`wrapper-container ${className}`}>{children}</div>;
+  return <div className={`p-[1rem] ${className}`}>{children}</div>;
 }
