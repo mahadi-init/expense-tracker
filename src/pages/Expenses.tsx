@@ -2,17 +2,43 @@ import { IonButton, IonContent, IonPage } from "@ionic/react";
 import Wrapper from "../components/Wrapper";
 import Toolbar from "../components/Toolbar";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Calendar,
+  ChartBarStacked,
+  DollarSign,
+  NotebookPen,
+} from "lucide-react";
+import { useSWRConfig } from "swr";
+import useSWRMutation from "swr/mutation";
+import post from "../https/post";
+
+// Zod schema for form validation
+const expenseSchema = z.object({
+  amount: z
+    .number({ message: "Amount is required" })
+    .positive("Amount must be positive")
+    .min(0.01, "Amount must be at least 0.01"),
+  source: z
+    .string({ message: "Category is required" })
+    .min(1, "Please select a category"),
+  date: z
+    .string({ message: "Date is required" })
+    .refine((date) => !isNaN(Date.parse(date)), "Invalid date format"),
+  note: z.string().max(500, "Note must be less than 500 characters").optional(),
+});
+
+type ExpenseFormData = z.infer<typeof expenseSchema>;
 
 const Expenses: React.FC = () => {
-  const [formData, setFormData] = useState({
-    amount: "",
-    source: "",
-    date: "",
-    note: "",
-  });
-
-  const [focusedField, setFocusedField] = useState<string | null>(null);
   const [showCategories, setShowCategories] = useState(false);
+  const { mutate } = useSWRConfig();
+  const { trigger } = useSWRMutation(
+    "/expenses/add",
+    async (url, { arg }: { arg: ExpenseFormData }) => post(url, arg),
+  );
 
   // Popular expense categories
   const categories = [
@@ -27,28 +53,38 @@ const Expenses: React.FC = () => {
     { name: "Other", icon: "📝", color: "bg-gray-500" },
   ];
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    watch,
+    setValue,
+  } = useForm<ExpenseFormData>({
+    resolver: zodResolver(expenseSchema),
+  });
+
+  // Watch form values to determine focus states
+  const watchedValues = watch();
 
   const handleCategorySelect = (category: string) => {
-    handleInputChange("category", category);
+    setValue("source", category, { shouldValidate: true, shouldTouch: true });
     setShowCategories(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log("Expense submitted:", formData);
-  };
-
-  const getCurrentDate = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
+  const onSubmit = async (data: ExpenseFormData) => {
+    try {
+      await trigger(data);
+      mutate("/dashboard/stats");
+      reset();
+      reset(); // Reset form after successful submission
+    } catch (error) {
+      console.error("Error submitting expense:", error);
+    }
   };
 
   const getSelectedCategory = () => {
-    return categories.find((cat) => cat.name === formData.source);
+    return categories.find((cat) => cat.name === watchedValues.source);
   };
 
   return (
@@ -84,187 +120,141 @@ const Expenses: React.FC = () => {
 
             {/* Form Container */}
             <div className="max-w-md mx-auto">
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Amount Field */}
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 <div className="relative">
-                  <div
-                    className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
-                      focusedField === "amount" || formData.amount
-                        ? "text-red-500"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                      />
-                    </svg>
-                  </div>
+                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 text-blue-500" />
                   <input
                     type="number"
                     step="0.01"
                     placeholder="0.00"
-                    value={formData.amount}
-                    onChange={(e) =>
-                      handleInputChange("amount", e.target.value)
-                    }
-                    onFocus={() => setFocusedField("amount")}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full pl-12 pr-4 py-4 text-lg font-semibold bg-white dark:bg-gray-800 border-2 rounded-2xl transition-all duration-200 placeholder-gray-400 ${
-                      focusedField === "amount"
-                        ? "border-red-500 ring-4 ring-red-100 dark:ring-red-900/30 shadow-lg"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                    } text-gray-900 dark:text-white focus:outline-none`}
+                    {...register("amount", { valueAsNumber: true })}
+                    className="w-full pl-12 pr-4 py-4 text-lg font-semibold bg-white dark:bg-gray-800 rounded-2xl transition-all duration-200 placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none"
                   />
+                  {errors.amount && (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                      {errors.amount.message}
+                    </p>
+                  )}
                 </div>
 
-                {/* Source Field */}
+                {/* Category Field */}
                 <div className="relative">
-                  <div
-                    className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
-                      focusedField === "source" || formData.source
-                        ? "text-blue-500"
-                        : "text-gray-400"
-                    }`}
+                  <ChartBarStacked className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 text-blue-500" />
+                  <button
+                    type="button"
+                    onClick={() => setShowCategories(!showCategories)}
+                    className={`w-full pl-12 pr-4 py-4 text-lg text-left bg-white dark:bg-gray-800  rounded-2xl transition-all duration-200 text-gray-900 dark:text-white focus:outline-none`}
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="e.g., Salary, Freelance, Business"
-                    value={formData.source}
-                    onChange={(e) =>
-                      handleInputChange("source", e.target.value)
-                    }
-                    onFocus={() => setFocusedField("source")}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full pl-12 pr-4 py-4 text-lg bg-white dark:bg-gray-800 border-2 rounded-2xl transition-all duration-200 placeholder-gray-400 ${
-                      focusedField === "source"
-                        ? "border-blue-500 ring-4 ring-blue-100 dark:ring-blue-900/30 shadow-lg"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                    } text-gray-900 dark:text-white focus:outline-none`}
-                  />
+                    {getSelectedCategory() ? (
+                      <div className="flex items-center space-x-2">
+                        <span>{getSelectedCategory()?.icon}</span>
+                        <span>{getSelectedCategory()?.name}</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">Select category</span>
+                    )}
+                  </button>
+                  <input type="hidden" {...register("source")} />
+                  {errors.source && (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                      {errors.source.message}
+                    </p>
+                  )}
                 </div>
+
+                {/* Category Selection Modal */}
+                {showCategories && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm max-h-96 overflow-y-auto">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          Select Category
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setShowCategories(false)}
+                          className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                          <svg
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2">
+                        {categories.map((category) => (
+                          <button
+                            key={category.name}
+                            type="button"
+                            onClick={() => handleCategorySelect(category.name)}
+                            className="flex items-center space-x-3 p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+                          >
+                            <div
+                              className={`w-8 h-8 ${category.color} rounded-lg flex items-center justify-center text-white text-sm`}
+                            >
+                              {category.icon}
+                            </div>
+                            <span className="text-gray-900 dark:text-white font-medium">
+                              {category.name}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Date Field */}
                 <div className="relative">
-                  <div
-                    className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
-                      focusedField === "date" || formData.date
-                        ? "text-blue-500"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 text-blue-500" />
+
                   <input
                     type="date"
-                    value={formData.date || getCurrentDate()}
-                    onChange={(e) => handleInputChange("date", e.target.value)}
-                    onFocus={() => setFocusedField("date")}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full pl-12 pr-4 py-4 text-lg bg-white dark:bg-gray-800 border-2 rounded-2xl transition-all duration-200 ${
-                      focusedField === "date"
-                        ? "border-blue-500 ring-4 ring-blue-100 dark:ring-blue-900/30 shadow-lg"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                    } text-gray-900 dark:text-white focus:outline-none`}
+                    {...register("date")}
+                    className="w-full pl-12 pr-4 py-4 text-lg bg-white dark:bg-gray-800  rounded-2xl transition-all duration-200 text-gray-900 dark:text-white focus:outline-none"
                   />
+                  {errors.date && (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                      {errors.date.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* Note Field */}
                 <div className="relative">
-                  <div
-                    className={`absolute left-4 top-4 transition-colors duration-200 ${
-                      focusedField === "note" || formData.note
-                        ? "text-orange-500"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                  </div>
+                  <NotebookPen
+                    size={20}
+                    className="absolute left-4 top-5 transition-colors duration-200 text-orange-500"
+                  />
                   <textarea
                     placeholder="What did you spend on? (optional)"
                     rows={4}
-                    value={formData.note}
-                    onChange={(e) => handleInputChange("note", e.target.value)}
-                    onFocus={() => setFocusedField("note")}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full pl-12 pr-4 py-4 text-lg bg-white dark:bg-gray-800 border-2 rounded-2xl transition-all duration-200 placeholder-gray-400 resize-none ${
-                      focusedField === "note"
-                        ? "border-orange-500 ring-4 ring-orange-100 dark:ring-orange-900/30 shadow-lg"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                    } text-gray-900 dark:text-white focus:outline-none`}
+                    {...register("note")}
+                    className="w-full pl-12 pr-4 py-4 text-lg bg-white dark:bg-gray-800 rounded-2xl transition-all duration-200 placeholder-gray-400 resize-none  text-gray-900 dark:text-white focus:outline-none"
                   />
-                </div>
-
-                {/* Quick Amount Buttons */}
-                <div className="space-y-3">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Quick amounts:
-                  </p>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[10, 25, 50, 100].map((amount) => (
-                      <IonButton
-                        key={amount}
-                        type="button"
-                        shape="round"
-                        size="small"
-                        onClick={() =>
-                          handleInputChange("amount", amount.toString())
-                        }
-                      >
-                        ${amount}
-                      </IonButton>
-                    ))}
-                  </div>
+                  {errors.note && (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                      {errors.note.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* Submit Button */}
-                <IonButton type="submit" color={"success"} className="w-full">
+                <IonButton
+                  type="submit"
+                  color={"success"}
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
                   <div className="flex items-center justify-center space-x-2">
                     <svg
                       className="w-5 h-5"
@@ -279,31 +269,9 @@ const Expenses: React.FC = () => {
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                       />
                     </svg>
-                    <span>Add Expense</span>
+                    <span>{isSubmitting ? "Adding..." : "Add Expense"}</span>
                   </div>
                 </IonButton>
-
-                {/* Alternative Actions */}
-                <div className="flex space-x-3 pt-4">
-                  <IonButton
-                    type="button"
-                    onClick={() =>
-                      setFormData({
-                        amount: "",
-                        source: "",
-                        date: "",
-                        note: "",
-                      })
-                    }
-                    color={"danger"}
-                    className="w-full"
-                  >
-                    Clear Form
-                  </IonButton>
-                  <IonButton type="button" className="w-full">
-                    Save & Add Another
-                  </IonButton>
-                </div>
               </form>
             </div>
 
