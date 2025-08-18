@@ -31,6 +31,7 @@ import { lazy, useEffect, useState } from "react";
 import AppLoader from "./components/AppLoader";
 import { Redirect, Route } from "react-router";
 import { cardOutline, home, settings, walletOutline } from "ionicons/icons";
+import ExpenseList from "./pages/ExpensesList";
 
 const Home = lazy(() => import("./pages/Home"));
 const Expenses = lazy(() => import("./pages/Expenses"));
@@ -39,6 +40,15 @@ const Income = lazy(() => import("./pages/Income"));
 const IncomeList = lazy(() => import("./pages/IncomeList"));
 
 setupIonicReact();
+
+const routes = [
+  { path: "/home", component: Home },
+  { path: "/income", component: Income },
+  { path: "/income/list", component: IncomeList },
+  { path: "/expenses", component: Expenses },
+  { path: "/expenses/list", component: ExpenseList },
+  { path: "/settings", component: Settings },
+];
 
 const App: React.FC = () => {
   const [initializing, setInitializing] = useState(true);
@@ -104,21 +114,11 @@ const App: React.FC = () => {
       <IonReactRouter>
         <IonTabs>
           <IonRouterOutlet>
-            <Route exact path="/home">
-              <Home />
-            </Route>
-            <Route exact path="/income">
-              <Income />
-            </Route>
-            <Route path="/income/list">
-              <IncomeList />
-            </Route>
-            <Route exact path="/expenses">
-              <Expenses />
-            </Route>
-            <Route exact path="/settings">
-              <Settings />
-            </Route>
+            {routes.map(({ path, component: Component }) => (
+              <Route key={path} exact path={path}>
+                <Component />
+              </Route>
+            ))}
             <Route exact path="/">
               <Redirect to="/home" />
             </Route>
