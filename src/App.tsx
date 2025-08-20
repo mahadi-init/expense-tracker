@@ -1,13 +1,4 @@
-import {
-  IonApp,
-  IonIcon,
-  IonLabel,
-  IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-  setupIonicReact,
-} from "@ionic/react";
+import { IonApp, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 
 /* Core CSS required for Ionic components to work properly */
@@ -27,31 +18,18 @@ import "./theme/variables.css";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { Capacitor } from "@capacitor/core";
-import { lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AppLoader from "./components/AppLoader";
-import { Redirect, Route } from "react-router";
-import { cardOutline, home, settings, walletOutline } from "ionicons/icons";
-import ExpenseList from "./pages/ExpensesList";
-
-const Home = lazy(() => import("./pages/Home"));
-const Expenses = lazy(() => import("./pages/Expenses"));
-const Settings = lazy(() => import("./pages/Settings"));
-const Income = lazy(() => import("./pages/Income"));
-const IncomeList = lazy(() => import("./pages/IncomeList"));
+import TabRoutes from "./pages/TabRoutes";
+import AuthRoutes from "./pages/AuthRoutes";
+import { useAtomValue } from "jotai";
+import { userAtom } from "./lib/atoms";
 
 setupIonicReact();
 
-const routes = [
-  { path: "/home", component: Home },
-  { path: "/income", component: Income },
-  { path: "/income/list", component: IncomeList },
-  { path: "/expenses", component: Expenses },
-  { path: "/expenses/list", component: ExpenseList },
-  { path: "/settings", component: Settings },
-];
-
 const App: React.FC = () => {
   const [initializing, setInitializing] = useState(true);
+  const user = useAtomValue(userAtom);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -111,38 +89,7 @@ const App: React.FC = () => {
 
   return (
     <IonApp>
-      <IonReactRouter>
-        <IonTabs>
-          <IonRouterOutlet>
-            {routes.map(({ path, component: Component }) => (
-              <Route key={path} exact path={path}>
-                <Component />
-              </Route>
-            ))}
-            <Route exact path="/">
-              <Redirect to="/home" />
-            </Route>
-          </IonRouterOutlet>
-          <IonTabBar slot="bottom">
-            <IonTabButton tab="home" href="/home">
-              <IonIcon aria-hidden="true" icon={home} />
-              <IonLabel>Home</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="income" href="/income">
-              <IonIcon aria-hidden="true" icon={cardOutline} />
-              <IonLabel>Income</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="expenses" href="/expenses">
-              <IonIcon aria-hidden="true" icon={walletOutline} />
-              <IonLabel>Expenses</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="settings" href="/settings">
-              <IonIcon aria-hidden="true" icon={settings} />
-              <IonLabel>Settings</IonLabel>
-            </IonTabButton>
-          </IonTabBar>
-        </IonTabs>
-      </IonReactRouter>
+      <IonReactRouter>{user ? <TabRoutes /> : <AuthRoutes />}</IonReactRouter>
     </IonApp>
   );
 };

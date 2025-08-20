@@ -7,11 +7,13 @@
         "@capacitor/android": "7.4.2",
         "@capacitor/app": "7.0.2",
         "@capacitor/core": "7.4.2",
+        "@capacitor/dialog": "^7.0.2",
         "@capacitor/haptics": "7.0.2",
         "@capacitor/keyboard": "7.0.2",
         "@capacitor/preferences": "^7.0.2",
         "@capacitor/splash-screen": "^7.0.2",
         "@capacitor/status-bar": "^7.0.2",
+        "@capacitor/toast": "^7.0.2",
         "@hookform/resolvers": "^5.2.1",
         "@ionic/react": "^8.5.0",
         "@ionic/react-router": "^8.5.0",
@@ -260,6 +262,8 @@
 
     "@capacitor/core": ["@capacitor/core@7.4.2", "", { "dependencies": { "tslib": "^2.1.0" } }, "sha512-akCf9A1FUR8AWTtmgGjHEq6LmGsjA2U7igaJ9PxiCBfyxKqlDbuGHrlNdpvHEjV5tUPH3KYtkze6gtFcNKPU9A=="],
 
+    "@capacitor/dialog": ["@capacitor/dialog@7.0.2", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-2lRMKEdBV/2LMCwHbC5a03jiU4tdlIN4hXAqmQMxnaa7CAVLfk/vEE+vxA5mpnI/pzoXF/QDQEUXJUd10hbcKA=="],
+
     "@capacitor/haptics": ["@capacitor/haptics@7.0.2", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-vqfeEM6s2zMgLjpITCTUIy7P/hadq/Gr5E/RClFgMJPB41Y5FsqOKD+j85/uwh8N2cf/aWaPeXUmjnTzJbEB2g=="],
 
     "@capacitor/keyboard": ["@capacitor/keyboard@7.0.2", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-9We5BY1mu+QWOReDukr+6HxA4Bh0mKBU0txFtwXJdjBohttMYWJzB+dQf4oHrX8odiU2Cm/BfDdAU2wV06Cyig=="],
@@ -269,6 +273,8 @@
     "@capacitor/splash-screen": ["@capacitor/splash-screen@7.0.2", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-bchh4F73CnVONm6XFEgXKEhbSEDQh2CQ0rNSoasIeJ5pf9JqHkkPS3t0Fnm33qHkLVFcaPoKPW69Y9zMpT5Vxg=="],
 
     "@capacitor/status-bar": ["@capacitor/status-bar@7.0.2", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-fYYkkdzCbQV+MjZVnaQTFl5I4bddnFW8ZrPVxDjNoGVPTUG7H58Ij1+NcuNxHLXjJvZOoZeYJ3w3I16Wb2zssw=="],
+
+    "@capacitor/toast": ["@capacitor/toast@7.0.2", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-BPzxZNI1Qg58/yZzx8Y/iz1m6hBudx+vlbMkfWvcg3Z2Ph62xoSnQXE/28y54yE+c6JzAqH37NZeA8R8p9NW9A=="],
 
     "@colors/colors": ["@colors/colors@1.5.0", "", {}, "sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ=="],
 
